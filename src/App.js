@@ -1,46 +1,79 @@
-import React from "react";
-import Home from "./Home"
-import About from "./About"
-import Admin from "./Admin"
-import Signin from "./Signin"
-import Signup from "./Signup"
-import Logout from "./Logout"
-import unicornPic from "../src/pics/unicorns_inc.jpg"
-import { Link, Route, Switch } from "react-router-dom";
+import React, { useState, createContext } from 'react'
+import Home from './components/Home'
+import About from './components/About'
+import Admin from './components/Admin'
+import Signin from './components/Signin'
+import Signup from './components/Signup'
+import Logout from './components/Logout'
+import unicornPic from './images/unicorns_inc.jpg'
+import { Link, Route, Routes } from 'react-router-dom'
+import ProtectedRoute from './components/ProtectedRoute'
+import { AuthContext } from './utils/AuthContext'
+
+export const CompanyContext = createContext({})
 
 const App = () => {
+  // store company information in a state
+  const [company, setCompany] = useState({
+    name: 'Unicorns Inc.',
+    description: 'We are the best!',
+    numOfCustomers: 500000,
+  })
+  const [token, setToken] = useState(null)
+  console.log('token', token)
 
   return (
-    <div className="main-container">
-      <img src={unicornPic} alt="Unicorns Inc" />
-      <ul className="menu">
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/about">About</Link>
-        </li>
-        <li>
-          <Link to="/admin">Admin</Link>
-        </li>
-        <li>
-          <Link to="/signin">Signin</Link>
-        </li>
-        <li>
-          <Link to="/signup">Signup</Link>
-        </li>
-      </ul>
-      <Switch>
-            <Route path="/about" component={About} />
-            <Route path="/admin" component={Admin} />
-            <Route path="/signin" component={Signin} />
-            <Route path="/signup" component={Signup} />
-            <Route exact path="/" component={Home} />
-      </Switch>
-      {true && <Logout />}
-    </div>
-  );
-};
+    <AuthContext.Provider value={{ token, setToken }}>
+      <CompanyContext.Provider value={{ company, setCompany }}>
+        <div className='main-container'>
+          <img src={unicornPic} alt='Unicorns Inc' />
+          <ul className='menu'>
+            <li>
+              <Link to='/'>Home</Link>
+            </li>
+            <li>
+              <Link to='/about'>About</Link>
+            </li>
+            <li>
+              <Link to='/admin'>Admin</Link>
+            </li>
+            {token === null ? (
+              <>
+                <li>
+                  <Link to='/signin'>Signin</Link>
+                </li>
+                <li>
+                  <Link to='/signup'>Signup</Link>
+                </li>
+              </>
+            ) : (
+              <Logout />
+            )}
+          </ul>
 
+          <Routes>
+            <Route path='/about' element={<About />} />
+            <Route
+              path='/admin'
+              element={
+                <ProtectedRoute>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            />
+            <Route path='/signin' element={<Signin />} />
+            <Route path='/signup' element={<Signup />} />
+            <Route path='/' element={<Home />} />
+          </Routes>
+          <footer>
+            <p>
+              &copy; {new Date().getFullYear()} {company.name}
+            </p>
+          </footer>
+        </div>
+      </CompanyContext.Provider>
+    </AuthContext.Provider>
+  )
+}
 
-export default App;
+export default App
