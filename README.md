@@ -1,6 +1,6 @@
 # Showcase project using context hooks
 
-[React Admin Docs](https://reactjs.org/docs/hooks-reference.html)
+[React Docs Hooks](https://reactjs.org/docs/hooks-reference.html)
 
 ## Getting Started with Create React App
 
